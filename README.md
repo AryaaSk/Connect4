@@ -17,3 +17,7 @@ URL: https://connect4-863d1.web.app
 
 ## Embeded:
 Use this URL to access the embed mode: https://connect4-863d1.web.app/game.html?embed=true
+
+The minimum width and height is: 740px X 1000px
+If this is too large or too small for you, you can also add an optional scale parameter, 0.5 will apply a 50% scale, 2 will apply a 200% scale.
+Here is an example of a URL with scale: https://connect4-863d1.web.app/game.html?embed=true&&scale=0.5

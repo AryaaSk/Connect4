@@ -24,6 +24,12 @@ app.controller("game", function($scope){
             //for now lets just give it regular player data
             $scope.players = [{name: "Embed1", id: null, rating: null, colour: "red"}, {name: "Embed2", id: null, rating: null, colour: "blue"}]; 
             
+            //site might also pass in a scale value
+            let scale = Number(url.searchParams.get("scale"));
+            if (scale == null) { scale = 1; }
+            const scalePercentage = scale * 100;
+            document.getElementById("containerOuter").style.zoom = String(scalePercentage) + "%";
+
             //when it is embeded we don't need the side cards (showing the 2 players)
             document.getElementById("playerInfo").style.visibility = "hidden"; //hide cards
             document.getElementById("splitGrid").style.gridTemplateColumns = "100% 0%"; //make the connect4 grid container fill the entire screen, by changing the grid layout from 70% 30% to 100% 0%;

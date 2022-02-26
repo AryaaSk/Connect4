@@ -18,12 +18,9 @@
         <div class="containerOuter" ng-init="startGame()" id="containerOuter">
             <div class="container" id="splitGrid">
                 <div class="containerInner" id="containerInner">
-
                     <h1>Connect4</h1>
-                    
                     <h1 ng-hide="!gameOver">{{capitalise(currentColour)}} Won !</h1>
-        
-                    <br>
+
                     <div class="connect4Row containerDiv" style="width: 700px; height: 100px; ;border-left: 1px solid var(--borderColourDrop); border-top: 1px solid var(--borderColourDrop);">
                         <div class="connect4ItemContainer drop" ng-click="drop(0)"><div class="counter drop" ng-style="{'background-color': currentColour }"></div></div>
                         <div class="connect4ItemContainer drop" ng-click="drop(1)"><div class="counter drop" ng-style="{'background-color': currentColour }"></div></div>
