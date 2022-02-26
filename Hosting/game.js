@@ -21,11 +21,8 @@ app.controller("game", function($scope){
         //if game is in embed mode (it is being played from an external source e.g. my operatingSystem website) then just take the playerData from the URL.
         if (embed == true)  //when it is in embed mode, you don't need an id since there is no backend
         {
-            $scope.num1 = window.innerWidth
-            $scope.num2 = window.innerHeight
-
             //for now lets just give it regular player data
-            $scope.players = [{name: "Embed1", id: null, rating: null, colour: "orange"}, {name: "Embed2", id: null, rating: null, colour: "blue"}]; 
+            $scope.players = [{name: "Embed1", id: null, rating: null, colour: "red"}, {name: "Embed2", id: null, rating: null, colour: "blue"}]; 
             
             //when it is embeded we don't need the side cards (showing the 2 players)
             document.getElementById("playerInfo").style.visibility = "hidden"; //hide cards

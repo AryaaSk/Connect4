@@ -16,6 +16,4 @@ firebase deploy
 URL: https://connect4-863d1.web.app
 
 ## Embeded:
-Use this URL to access the embed mode:
-```
-```
+Use this URL to access the embed mode: https://connect4-863d1.web.app/game.html?embed=true
