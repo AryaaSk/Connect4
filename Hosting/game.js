@@ -30,12 +30,14 @@ app.controller("game", function($scope){
             const scalePercentage = scale * 100;
             document.getElementById("containerOuter").style.zoom = String(scalePercentage) + "%";
 
-            //when it is embeded we don't need the side cards (showing the 2 players)
-            document.getElementById("playerInfo").style.visibility = "hidden"; //hide cards
-            document.getElementById("splitGrid").style.gridTemplateColumns = "100% 0%"; //make the connect4 grid container fill the entire screen, by changing the grid layout from 70% 30% to 100% 0%;
+            //trying to make it as simple as possible when it is embeded:
+            document.getElementById("container").style.width = "800px"; //only need 800px instead of 1300px as we don't have the side info any more
+            $scope.$applyAsync();
 
-            document.getElementById("splitGrid").style.width = "700px"; //can resize all containers to 700px (width of board)
-            document.getElementById("containerInner").style.width = "700px";
+            //when it is embeded we don't need the side cards (showing the 2 players), 
+            document.getElementById("playerInfo").style.visibility = "hidden"; //hide cards
+            document.getElementById("container").style.gridTemplateColumns = "100% 0%"; //make the connect4 grid container fill the entire screen, by changing the grid layout from 70% 30% to 100% 0%;
+
             document.getElementById("containerInner").style.paddingTop = "0px"; //removing padding
             document.getElementById("containerOuter").style.overflow = "hidden"; //dont need overflow since screen params will be managed externally
 
