@@ -1,0 +1,17 @@
+/*This css file is just for the player info (on the right)*/
+
+.playerBox
+{
+	height: 200px;
+	width: 300px;
+	border-radius: 20px;
+	padding: 8px;
+	margin-bottom: 10px;
+
+	background-color: rgb(225, 225, 225);
+	text-align: left;
+
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-rows: 30% 70%;
+}

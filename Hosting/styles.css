@@ -1,0 +1,93 @@
+body
+{
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    --borderColour: grey;
+    --borderColourDrop: black;
+}
+.containerDiv
+{
+    margin: 0 auto; /*text align center wasnt working so I just applied this to all divs*/
+}
+
+.containerOuter
+{
+    height: 100vh;
+    width: 100vw;
+
+    overflow-y: hidden;
+}
+.container
+{
+    height: 100%;
+    width: 1300px;
+    margin: 0 auto;
+
+    display: grid;
+	grid-template-columns: 70% 30%;
+	grid-template-rows: 100%;
+}
+.containerInner
+{	height: 100%;
+	width: 100%;
+    padding-top: 50px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+.connect4Grid
+{
+    height: 600px;
+    width: 700px;
+
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+
+    border-top: 1px solid var(--borderColour);
+    border-left: 1px solid var(--borderColour);
+}
+.connect4Row
+{
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+
+}
+
+.connect4ItemContainer
+{
+    height: 100%;
+    width: 100%;
+
+    display: grid;
+    place-content: center;
+
+    border-bottom: 1px solid var(--borderColour);
+    border-right: 1px solid var(--borderColour);
+}
+.connect4ItemContainer.drop
+{
+    border-bottom: 1px solid var(--borderColourDrop);
+    border-right: 1px solid var(--borderColourDrop);
+}
+.counter
+{
+    height: 80px;
+    width: 80px;
+
+    border-radius: 40px;
+}
+.counter.drop
+{
+    opacity: 0%;
+}
+.counter.drop:hover
+{
+    opacity: 50%;
+}
