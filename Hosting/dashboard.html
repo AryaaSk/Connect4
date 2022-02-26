@@ -1,0 +1,46 @@
+<head>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.js"></script>
+    
+    <script src="script.js"></script>
+    <script src="dashboard.js"></script>
+    
+    <style>
+        @import url("dashboard.css");
+    </style>
+</head>
+
+<body ng-app="connect4">
+    <div ng-controller="dashboard">
+        
+        <div class="container">
+            <div class="containerInner">
+
+                <div class="buttons">
+                    <input type="button" value="Login/Signup" class="dashboardButton" ng-click="loginSignup()">
+                    <div style="width: 100%; height: 200px;"></div> <!-- Seperator DIV -->
+                    <input type="button" value="Find Match" class="dashboardButton" ng-click="findGame()">
+                </div>
+
+                <div id="loginSignupWrapper">
+                    <div class="loginSignup">
+                        <div class="loginSignupContainerDiv">
+                            <!-- Switching between login and signup, and close button-->
+                        </div>
+    
+                        <div class="loginSignupContainerDiv">
+                            <!-- Actual Content (name, email, password) -->
+                        </div>
+    
+                        <div class="loginSignupContainerDiv">
+                            <!-- Login/Signup button-->
+                        </div>
+                    </div>
+                    <div class="loginSignupShadow"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</body>
