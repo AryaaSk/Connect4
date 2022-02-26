@@ -15,12 +15,12 @@
 <body ng-app="connect4">
     <div ng-controller="game">
 
-        <div class="containerOuter" ng-init="startGame()">
-
-            <div class="container">
-                <div class="containerInner">
+        <div class="containerOuter" ng-init="startGame()" id="containerOuter">
+            <div class="container" id="splitGrid">
+                <div class="containerInner" id="containerInner">
 
                     <h1>Connect4</h1>
+                    <div style="position: absolute;">{{num1}} {{num2}}</div>
                     
                     <h1 ng-hide="!gameOver">{{capitalise(currentColour)}} Won !</h1>
         
@@ -45,13 +45,13 @@
                             </div>
                         </div>
                     </div>
-            
+
+                    <br>
+                    <input ng-show="gameOver == true" type="button" value="Restart Game" style="color: blue; cursor: pointer; border: none; background-color: transparent; font-size: 30px; text-decoration: underline;" ng-click="startGame()">
                 </div>
             
-                <div class="containerInner">
-
+                <div class="containerInner" id="playerInfo">
                     <h1>Players</h1>
-
                     <br>
                     <div class="playerBox containerDiv" ng-repeat="player in players track by $index">
                         <div>

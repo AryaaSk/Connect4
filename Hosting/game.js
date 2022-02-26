@@ -1,26 +1,56 @@
 app.controller("game", function($scope){
 	
-	//making player objects (will get from firebase later)
-	$scope.players = [{name: "Player 1", id: "213819904", rating: 1000, colour: "red"}, {name: "Player 2", id: "1324914", rating: 1025, colour: "blue"}];
-	
+    $scope.players = [];
+
 	$scope.currentColour = "";
-	//we have the colours in the players var
-	$scope.colour1 = $scope.players[0].colour;
-	$scope.colour2 = $scope.players[1].colour;
+    //we have the colours in the players var
+	$scope.colour1 = "";
+	$scope.colour2 = "";
 
 	$scope.gameOver = false;
 	$scope.inAnimation = false;
 
-	$scope.startGame = function()
+	$scope.startGame = function() //also the restart game function
 	{
-		$scope.switchPlayer();	
+        //check if the game is in embed mode
+        const urlString = window.location.href;
+        const url = new URL(urlString);
+        let embed = url.searchParams.get("embed") === 'true'; //have to use this method since Boolean(string) is unreliable
+        if (embed == null) { embed = false; }
+        
+        //if game is in embed mode (it is being played from an external source e.g. my operatingSystem website) then just take the playerData from the URL.
+        if (embed == true)  //when it is in embed mode, you don't need an id since there is no backend
+        {
+            $scope.num1 = window.innerWidth
+            $scope.num2 = window.innerHeight
+
+            //for now lets just give it regular player data
+            $scope.players = [{name: "Embed1", id: null, rating: null, colour: "orange"}, {name: "Embed2", id: null, rating: null, colour: "blue"}]; 
+            
+            //when it is embeded we don't need the side cards (showing the 2 players)
+            document.getElementById("playerInfo").style.visibility = "hidden"; //hide cards
+            document.getElementById("splitGrid").style.gridTemplateColumns = "100% 0%"; //make the connect4 grid container fill the entire screen, by changing the grid layout from 70% 30% to 100% 0%;
+
+            document.getElementById("splitGrid").style.width = "700px"; //can resize all containers to 700px (width of board)
+            document.getElementById("containerInner").style.width = "700px";
+            document.getElementById("containerInner").style.paddingTop = "0px"; //removing padding
+            document.getElementById("containerOuter").style.overflow = "hidden"; //dont need overflow since screen params will be managed externally
+
+            //ABSOLUTE SMALLEST THE WINDOW CAN SUPPORT IS (740 X 1000)
+        }
+        else //get player objects from firebase (will do later)
+        { $scope.players = [{name: "Player 1", id: "213819904", rating: 1000, colour: "red"}, {name: "Player 2", id: "1324914", rating: 1025, colour: "blue"}]; }
+
+        //we have the colours in the players var
+        $scope.colour1 = $scope.players[0].colour;
+        $scope.colour2 = $scope.players[1].colour;
+		$scope.switchPlayer(); //to get the default colour
 
 		$scope.gameOver = false;
 		$scope.grid = [];
 		i = 0;
 		while (i != 6) //6 rows
 		{ $scope.grid.push(["white", "white", "white", "white", "white", "white", "white"]); i += 1; }
-		
 	};
 	$scope.switchPlayer = function()
 	{
