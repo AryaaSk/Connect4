@@ -13,8 +13,8 @@ body
 
 .containerOuter
 {
-    height: 100vh;
-    width: 100vw;
+    height: 100%; /*embed mode doesnt work on chrome when using 100vh/100vw, so i used 100% which should do the same thing in theory*/
+    width: 100%;
 
     overflow-y: hidden;
 }
