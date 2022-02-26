@@ -47,7 +47,7 @@ app.controller("game", function($scope){
 		$scope.grid = [];
 		i = 0;
 		while (i != 6) //6 rows
-		{ $scope.grid.push(["white", "white", "white", "white", "white", "white", "white"]); i += 1; }
+		{ $scope.grid.push(["transparent", "transparent", "transparent", "transparent", "transparent", "transparent", "transparent"]); i += 1; }
 	};
 	$scope.switchPlayer = function()
 	{
@@ -68,7 +68,7 @@ app.controller("game", function($scope){
 		//keeping looping through rows at column to find where there is a space
 		var rowIndex = 0;
 		try
-		{ while ($scope.grid[rowIndex][column] == "white") {  rowIndex += 1; } }
+		{ while ($scope.grid[rowIndex][column] == "transparent") {  rowIndex += 1; } }
 		catch
 		{}
 		rowIndex -= 1;
@@ -96,7 +96,7 @@ app.controller("game", function($scope){
 		var i = 0;
 		var repeat = setInterval(function() {
 			//now remove and add it in the column underneath until the loop breaks
-			$scope.grid[i][column] = "white"
+			$scope.grid[i][column] = "transparent"
 			$scope.grid[i + 1][column] = $scope.currentColour;
 			$scope.$applyAsync(); //for some reason you need this since it doesnt automatically update
 
