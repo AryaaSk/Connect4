@@ -1,3 +1,5 @@
+var app = angular.module("connect4", []);
+
 app.controller("game", function($scope){
 	
     $scope.players = [];
