@@ -4,11 +4,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script> -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-database.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.js"></script>
     
     <script src="dashboard.js"></script>
     
@@ -21,7 +18,7 @@
 <body ng-app="connect4">
     <div ng-controller="dashboard">
         
-        <div class="container" ng-init="loginSignup()">
+        <div class="container">
             <div class="containerInner">
 
                 <div class="buttons">
@@ -51,7 +48,7 @@
                                 <input type="text" placeholder="Email Address" class="authTextfield" ng-model="emailAddress"> <br>
                                 <input type="text" placeholder="Password" class="authTextfield" ng-model="password"> <br>
 
-                                <input type="button" value="Login" class="authButton" ng-click="loginClicked()">
+                                <input type="button" value="Login" class="authButton" ng-click="login()">
                             </div>
 
                             <!-- Signup -->
