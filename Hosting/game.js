@@ -2,7 +2,7 @@ var app = angular.module("connect4", []);
 
 app.controller("game", function($scope){
 	
-    $scope.players = [];
+    $scope.players = [{name: "Embed1", id: null, rating: null, colour: "#ff0000"}, {name: "Embed2", id: null, rating: null, colour: "#0000ff"}]; //embed by default
 
 	$scope.currentColour = "";
     //we have the colours in the players var
@@ -23,9 +23,11 @@ app.controller("game", function($scope){
         //if game is in embed mode (it is being played from an external source e.g. my operatingSystem website) then just take the playerData from the URL.
         if (embed == true)  //when it is in embed mode, you don't need an id since there is no backend
         {
-            //for now lets just give it regular player data
-            $scope.players = [{name: "Embed1", id: null, rating: null, colour: "red"}, {name: "Embed2", id: null, rating: null, colour: "blue"}]; 
-            
+		//when embedded is true, we want the user to be able to select a colour, so we show the .selectColour screen
+		document.getElementById("selectColour").style.display = "grid";
+
+		//colour is set by the colour pickers set at the front            
+
             //site might also pass in a scale value
             let scale = Number(url.searchParams.get("scale"));
             if (scale == null) { scale = 1; }
@@ -46,7 +48,7 @@ app.controller("game", function($scope){
             //ABSOLUTE SMALLEST THE WINDOW CAN SUPPORT IS (740 X 1000)
         }
         else //get player objects from firebase (will do later)
-        { $scope.players = [{name: "Player 1", id: "213819904", rating: 1000, colour: "red"}, {name: "Player 2", id: "1324914", rating: 1025, colour: "blue"}]; }
+        { $scope.players = [{name: "Player 1", id: "213819904", rating: 1000, colour: "#ff0000"}, {name: "Player 2", id: "1324914", rating: 1025, colour: "#0000ff"}]; }
 
         //we have the colours in the players var
         $scope.colour1 = $scope.players[0].colour;
@@ -59,6 +61,20 @@ app.controller("game", function($scope){
 		while (i != 6) //6 rows
 		{ $scope.grid.push(["transparent", "transparent", "transparent", "transparent", "transparent", "transparent", "transparent"]); i += 1; }
 	};
+	$scope.selectedColours = function()
+	{
+		//after user has selected colours with the colour picker at the start (only in embedded mode)
+		//hide the colour pickers
+		document.getElementById("selectColour").style.display = "none";
+		
+		//reset the colours, since they are set when the game is run
+		$scope.currentColour = "";
+		$scope.colour1 = $scope.players[0].colour;
+        	$scope.colour2 = $scope.players[1].colour;
+		$scope.switchPlayer();
+		
+	}
+
 	$scope.switchPlayer = function()
 	{
 		//check current player (with colour)

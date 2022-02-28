@@ -82,3 +82,47 @@
 {
     opacity: 50%;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.selectColour
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: white;
+	
+	display: none;
+	place-content: center; /*we will show this dynamically with javascript after checking is embed=true, it will be set to display: grid*/
+}
+.selectColourContent
+{
+	height: max-content;
+	width: max-content;
+
+	text-align: center;
+}
+
+
+
+
+
+
+
+
+
+

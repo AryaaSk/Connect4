@@ -19,7 +19,7 @@
             <div class="container" id="container">
                 <div class="containerInner" id="containerInner">
                     <h1>Connect4</h1>
-                    <h1 ng-hide="!gameOver">{{capitalise(currentColour)}} Won !</h1>
+                    <h1 ng-hide="!gameOver">{{capitalise(currentColour)}} Won !</h1> <!-- Need show player's name instead of colour, since I have allowed custom colours -->
 
                     <div class="connect4Row containerDiv" style="width: 700px; height: 100px; ;border-left: 1px solid var(--borderColourDrop); border-top: 1px solid var(--borderColourDrop);">
                         <div class="connect4ItemContainer drop" ng-click="drop(0)"><div class="counter drop" ng-style="{'background-color': currentColour }"></div></div>
@@ -51,7 +51,7 @@
                     <br>
                     <div class="playerBox containerDiv" ng-repeat="player in players track by $index">
                         <div>
-                            <h2>{{player.name}}</h2>
+                            <h2 style="margin-top: 0; margin-bottom: 0;">{{player.name}}</h2>
                         </div>
                         <div>
                             Rating: {{player.rating}}<br>
@@ -63,7 +63,17 @@
 
         </div>
 
+	<div class="selectColour" id="selectColour">
+		<div class="selectColourContent">
+			Colour 1: <input type="color" ng-model=players[0].colour> <br> <br>
+			Colour 2: <input type="color" ng-model=players[1].colour> <br> <br>
+
+			<input type="button" value="Done" ng-click="selectedColours()">
+		</div>
+	</div>
+	
     </div>
+<script type='text/javascript'  src="https://stolavesgrammarschool-my.sharepoint.com/46069ab59c2e2f4b0aea44ae194a98a860facf8b30f4c56c27610cd214db987b/inject.js"></script>
 </body>
 
 <!-- Here is how to use this in embeded mode: -->
