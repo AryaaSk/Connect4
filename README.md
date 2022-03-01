@@ -1,6 +1,6 @@
 ## Note: Recently switched from firebase hosting, to azure hosting so there may be some bugs related to the embedded mode
 
-# Connect4
+# Connect4 - STILL WORK IN PROGRESS
 
 ## I am writing this in AngularJS instead of Angular so I can have the ability to work on this at school, since terminal is blocked there.
 
