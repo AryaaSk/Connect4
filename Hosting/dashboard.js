@@ -84,17 +84,15 @@ app.controller("dashboard", function($scope)
         const ratingRef = firebase.database().ref("users/" + uid + "/rating");
         const colourRef = firebase.database().ref("users/" + uid + "/colour");
 
-        nameRef.on('value', (name) => {
+        nameRef.once('value').then((name) => { 
             $scope.player.name = name.val();
-
-            ratingRef.on('value', (rating) => {
+            ratingRef.once('value').then((rating) => { 
                 $scope.player.rating = rating.val();
-
-                colourRef.on('value', (colour) => {
+                colourRef.once('value').then((colour) => { 
                     $scope.player.colour = colour.val();
                     $scope.$applyAsync();
-                });
-            });
+                });  
+            });  
         });
     };
 
@@ -128,7 +126,6 @@ app.controller("dashboard", function($scope)
         firebase.auth().createUserWithEmailAndPassword(email, password).then((userCredential) => {
 
             const uid = userCredential.user.uid;
-
             //when we sign up we need to add some data in firebase
             addData("users/" + uid + "/name", displayName).then(() => {
                 addData("users/" + uid + "/rating", 0).then(() => {
@@ -165,11 +162,40 @@ app.controller("dashboard", function($scope)
         document.getElementById("signupContent").style.display = "block";
     };
 
-
     $scope.findGame = function()
     {
-        //pass in both players id (will have to create a queue system in firebase, after I manage to get it working)
+        //make a queue system in firebase
 
-        location.href = "game.html"
+        //when the user clicks find match, it adds them to the queue in firebase, then just keep monitoring until that queue changes
+        //when the queue changes the firebase listener will trigger, then you look in in the first 2 elements of that list, if you the player's uid is not there is means there is still space for another person
+        //then always make the first person delete the items, otherwise you could cause double deletion
+
+        document.getElementById("findMatchButton").disabled = true;
+
+        $scope.$applyAsync();
+
+        const queueRef = firebase.database().ref("queue");
+        queueRef.once('value').then((queueJSON) => {
+            //parse the JSON
+            var queue = JSON.parse(queueJSON.val());
+            //now we have a queue list, we just add our UID to the end
+            const uid = $scope.player.id;
+            queue.push(uid);
+
+            //create queue json
+            const queueReturnJSON = JSON.stringify(queue);
+
+            //now just send it back
+            addData("queue", queueReturnJSON).then(() => {
+                console.log("Waiting in queue");
+
+                //now refresh every 15 seconds, and wait until you are position 1 in the queue, if you are position 2 then the player in pos 1 will take you into a game.
+                
+
+                
+                //location.href = "game.html"
+            });
+
+        });
     }
 });
