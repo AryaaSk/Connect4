@@ -11,18 +11,18 @@ Users can have a specific colour counter when they join, and they can change it 
 There can be more than 2 people, for example you can have 4 people playing on a bigger board.
 
 ## Hosting
-Used to use firebase to host but it was buggy especially while using firebase authentication for some reason, so I switch to azure static websites
+Used to use firebase to host but it was buggy especially while using firebase authentication for some reason, so I switch to azure static websites\
 OLD URL: https://connect4-863d1.web.app \
 New URL: https://aryaaconnect4.z33.web.core.windows.net
 
 *The Old URL will still be available for a little bit until I migrate everything to the new URL*
 
 ## Embeded:
-*Need to change in the future to the new url*
+*Need to change in the future to the new url*\
 Use this URL to access the embed mode: https://connect4-863d1.web.app/game.html?embed=true
 
-The minimum width and height is: 740px X 1000px
-If this is too large or too small for you, you can also add an optional scale parameter, 0.5 will apply a 50% scale, 2 will apply a 200% scale.
+The minimum width and height is: 740px X 1000px\
+If this is too large or too small for you, you can also add an optional scale parameter, 0.5 will apply a 50% scale, 2 will apply a 200% scale.\
 Here is an example of a URL with scale: https://connect4-863d1.web.app/game.html?embed=true&&scale=0.5
 
 Here is an example to just add to your HTML:
