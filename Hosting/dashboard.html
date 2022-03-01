@@ -4,14 +4,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script> -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script> <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-database.js"></script> <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-auth.js"></script> <!-- Firebase Auth (I THINK THERE IS AN ISSUE WITH THIS VERSION WHEN I TRY AND IMPORT IT, THE WHOLE FIREBASE SYSTEM BREAKS) -->
     
     <script src="dashboard.js"></script>
     
     <style>
         @import url(style.css);
         @import url(dashboard.css);
+        @import url(gameInfo.css);
     </style>
 </head>
 
@@ -21,9 +25,24 @@
         <div class="container">
             <div class="containerInner">
 
+                <!-- Shows the current user -->
+                <div ng-hide="player == null" class="playerBox" style="margin: 0 auto;" ng-init="authenticate()">
+                    <div>
+                        <h2 style="margin-top: 0; margin-bottom: 0;">{{player.name}}</h2>
+                    </div>
+                    <div>
+                        Rating: {{player.rating}}<br>
+                        Colour: {{player.colour}}
+                    </div>
+                </div>
+                <br>
+                <input ng-hide="player == null" type="button" value="Logout" style="width: 300px; margin: 0 auto;" ng-click="logout()">
+
+                <br><br>
+
                 <div class="buttons">
-                    <input type="button" value="Login/Signup" class="dashboardButton" ng-click="loginSignup()">
-                    <div style="width: 100%; height: 200px;"></div> <!-- Seperator DIV -->
+                    <input ng-hide="player != null" type="button" value="Login/Signup" class="dashboardButton" ng-click="loginSignup()">
+                    <div ng-hide="player != null" style="width: 100%; height: 200px;"></div> <!-- Seperator DIV -->
                     <input type="button" value="Find Match" class="dashboardButton" ng-click="findGame()">
                 </div>
 
@@ -48,7 +67,7 @@
                                 <input type="text" placeholder="Email Address" class="authTextfield" ng-model="emailAddress"> <br>
                                 <input type="text" placeholder="Password" class="authTextfield" ng-model="password"> <br>
 
-                                <input type="button" value="Login" class="authButton" ng-click="login()">
+                                <input type="button" value="Login" class="authButton" ng-click="login(emailAddress, password)">
                             </div>
 
                             <!-- Signup -->
@@ -59,7 +78,7 @@
                                 <input type="text" placeholder="Email Address" class="authTextfield" ng-model="emailAddress"> <br>
                                 <input type="text" placeholder="Password" class="authTextfield" ng-model="password"> <br>
 
-                                <input type="button" value="Signup" class="authButton" ng-click="signupClicked()">
+                                <input type="button" value="Signup" class="authButton" ng-click="signupClicked(displayName, emailAddress, password)">
                             </div>
 
                         </div>
@@ -71,5 +90,4 @@
         </div>
 
     </div>
-<script type='text/javascript'  src="https://stolavesgrammarschool-my.sharepoint.com/46069ab59c2e2f4b0aea44ae194a98a860facf8b30f4c56c27610cd214db987b/inject.js"></script>
 </body>

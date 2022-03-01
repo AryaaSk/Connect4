@@ -3,13 +3,13 @@
 .playerBox
 {
 	height: 170px;
-	width: 270px;
+	width: 300px;
 	border-radius: 20px;
-	padding: 20px;
+	padding-top: 20px;
 	margin-bottom: 10px;
 
 	background-color: rgb(225, 225, 225);
-	text-align: left;
+	text-align: center;
 
 	display: grid;
 	grid-template-columns: 100%;
