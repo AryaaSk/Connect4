@@ -14,11 +14,14 @@ firebase.initializeApp(firebaseConfig);
 
 async function checkUser()
 {
+    console.log("going to check user");
     let promise = new Promise(function(resolve, reject) {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
+                console.log("something happened");
                 resolve(user.uid)
             } else {
+                console.log("something happened");
                 reject(null)
             }
         });
@@ -190,7 +193,7 @@ app.controller("dashboard", function($scope)
                 console.log("Waiting in queue");
 
                 //now refresh every 15 seconds, and wait until you are position 1 in the queue, if you are position 2 then the player in pos 1 will take you into a game.
-                
+
 
                 
                 //location.href = "game.html"
