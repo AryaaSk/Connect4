@@ -14,15 +14,12 @@ firebase.initializeApp(firebaseConfig);
 
 async function checkUser()
 {
-    console.log("going to check user");
     let promise = new Promise(function(resolve, reject) {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                console.log("something happened");
-                resolve(user.uid)
+                resolve(user.uid);
             } else {
-                console.log("something happened");
-                reject(null)
+                reject(null);
             }
         });
     });
@@ -133,8 +130,10 @@ app.controller("dashboard", function($scope)
             addData("users/" + uid + "/name", displayName).then(() => {
                 addData("users/" + uid + "/rating", 0).then(() => {
                     addData("users/" + uid + "/colour", "#ff0000").then(() => {
-                        // once you have signed in and added all the data we need to reload the screen
-                        location.reload();
+                        addData("users/" + uid + "/currentGame", "Null").then(() => {
+                            // once you have signed in and added all the data we need to reload the screen
+                            location.reload();
+                        });
                     });                    
                 });
             });
@@ -169,35 +168,75 @@ app.controller("dashboard", function($scope)
     {
         //make a queue system in firebase
 
-        //when the user clicks find match, it adds them to the queue in firebase, then just keep monitoring until that queue changes
-        //when the queue changes the firebase listener will trigger, then you look in in the first 2 elements of that list, if you the player's uid is not there is means there is still space for another person
-        //then always make the first person delete the items, otherwise you could cause double deletion
+        //when the user clicks find match, the game checks if there is anyone in the queue, if there is then just create a new game, with gameID of your uid, then set that person's currentGame to the gameID, and your own gameID to your uid
 
         document.getElementById("findMatchButton").disabled = true;
 
-        $scope.$applyAsync();
-
         const queueRef = firebase.database().ref("queue");
         queueRef.once('value').then((queueJSON) => {
+            const uid = $scope.player.id;
+
             //parse the JSON
             var queue = JSON.parse(queueJSON.val());
-            //now we have a queue list, we just add our UID to the end
-            const uid = $scope.player.id;
-            queue.push(uid);
 
-            //create queue json
-            const queueReturnJSON = JSON.stringify(queue);
+            //check if the queue is empty
+            if (queue.length == 0)
+            {
+                //if it is empty add yourself to the queue, then start listening for a change in your currentGame
+                queue.push(uid);
+                const queueReturnJSON = JSON.stringify(queue);
+                addData("queue", queueReturnJSON).then(() => {
 
-            //now just send it back
-            addData("queue", queueReturnJSON).then(() => {
-                console.log("Waiting in queue");
+                    changed = 0;
+                    const gameRef = firebase.database().ref("users/" + uid + "/currentGame");
+                    gameRef.on('value', (snapshot) => {
+                        console.log("Waiting in queue");
+                        changed += 1; //the first time it is just getting the data, the second time is when it actually changes
 
-                //now refresh every 15 seconds, and wait until you are position 1 in the queue, if you are position 2 then the player in pos 1 will take you into a game.
+                        if (changed == 2)
+                        {
+                            //when there is a change, go to the game.html, and you will can read the currentGam from there
+                            location.href = "game.html";
+                            console.log("changed")
+                        }
+                    });
+                });
+            }
+            else
+            {
+                //if there is someone else in the queue, then create a new game, and set both of your currentGames to the gameID (which is your uid)
+                const gameID = uid;
+                const player1UID = uid;
+                const player2UID = queue[0];
 
+                const jsonData = JSON.stringify({ //just adding data underneath the game
+                    player1: player1UID,
+                    player2: player2UID
+                });
 
-                
-                //location.href = "game.html"
-            });
+                //create new game
+                addData("games/" + gameID, jsonData).then(() => {
+
+                    //set the currentGame of both users
+                    addData("users/" + player1UID + "/currentGame", gameID).then(() => {
+                        addData("users/" + player2UID + "/currentGame", gameID).then(() => {
+                            //once you have added both we can delete the 2 players from the queue
+                            const p1Index = queue.indexOf(player1UID);
+                            queue.splice(p1Index, 1);
+                            const p2Index = queue.indexOf(player2UID);
+                            queue.splice(p2Index, 1);
+
+                            const queueReturnJSON = JSON.stringify(queue);
+                            //upload the new queue back to firebase
+                            addData("queue", queueReturnJSON).then(() => {
+                                //then go to game.html (the gameID is stored in your user data in firebase)
+                                location.href = "game.html";
+                            });
+                        })
+                    })
+
+                })
+            }
 
         });
     }
