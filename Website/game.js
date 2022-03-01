@@ -1,7 +1,28 @@
 var app = angular.module("connect4", []);
 
 app.controller("game", function($scope){
-	
+
+	$scope.getPlayer = function(uid)
+	{
+		let promise = new Promise((resolve, reject) => {
+			//now get the playerData for both players
+			const playerRef = firebase.database().ref("users/" + uid);
+
+			playerRef.once('value').then((playerSnapshot) => { 
+				const playerData = playerSnapshot.val();
+				const player = {name: "", id: "", rating: 0, colour: "#000000"};
+
+				player.name = playerData.name;
+				player.id = uid;
+				player.rating = playerData.rating;
+				player.colour = playerData.colour;
+
+				resolve(player)
+			});
+		});
+		return promise
+	};
+
     $scope.players = [{name: "Embed1", id: null, rating: null, colour: "#ff0000"}, {name: "Embed2", id: null, rating: null, colour: "#0000ff"}]; //embed by default
 
 	$scope.currentColour = "";
@@ -48,7 +69,46 @@ app.controller("game", function($scope){
             //ABSOLUTE SMALLEST THE WINDOW CAN SUPPORT IS (740 X 1000)
         }
         else //get player objects from firebase (will do later)
-        { $scope.players = [{name: "Player 1", id: "213819904", rating: 1000, colour: "#ff0000"}, {name: "Player 2", id: "1324914", rating: 1025, colour: "#0000ff"}]; }
+        {
+			checkUser().then((uid) => {
+				//now that we have this uid we can use it to access the data from the database
+				//first we have to get the gameID from the currentGame property in firebase
+				const gameIDRef = firebase.database().ref("users/" + uid + "/currentGame");
+
+				gameIDRef.once('value').then((gameIDSnapshot) => { 
+					const gameID = gameIDSnapshot.val();
+					
+					//then use the gameID and get the game's data
+					const gameDataRef = firebase.database().ref("games/" + gameID);
+					gameDataRef.once('value').then((gameSnapshot) => { 
+						const gameData = JSON.parse(gameSnapshot.val());
+
+						const player1UID = gameData.player1;
+						const player2UID = gameData.player2;
+
+						//get data for both players
+						$scope.getPlayer(player1UID).then((value) => {
+							$scope.players[0] = value;
+							$scope.getPlayer(player2UID).then((value) => {
+								$scope.players[1] = value;
+
+								$scope.selectedColours(); //changing the colours
+								$scope.$applyAsync();
+							})
+						})
+
+					});
+
+				});
+
+				$scope.players = [{name: "Player 1", id: "213819904", rating: 1000, colour: "#ff0000"}, {name: "Player 2", id: "1324914", rating: 1025, colour: "#0000ff"}]; 
+
+
+			}, (rejected) => {
+				//not signed in, send back to index.html, where they will be redirected to dashboard
+				location.href = "index.html";
+			})
+		}
 
         //we have the colours in the players var
         $scope.colour1 = $scope.players[0].colour;
@@ -70,7 +130,7 @@ app.controller("game", function($scope){
 		//reset the colours, since they are set when the game is run
 		$scope.currentColour = "";
 		$scope.colour1 = $scope.players[0].colour;
-        	$scope.colour2 = $scope.players[1].colour;
+        $scope.colour2 = $scope.players[1].colour;
 		$scope.switchPlayer();
 		
 	}
@@ -107,38 +167,38 @@ app.controller("game", function($scope){
 		{
 			//just insert at row index using the animation function
 			$scope.inAnimation = true;
-			dropAnimation(rowIndex, column); //i would all the rest of the code is in the dropAnimationCompletion, .then isnt working.
+			dropAnimation(rowIndex, column).then(() => {
+				if ($scope.checkGrid($scope.currentColour) == true)  //only need to check the colour that has just moved, as only that colour could have been modified
+				{ $scope.gameOver = true; }
+				else
+				{ $scope.switchPlayer(); }
+			});
 		}
 	};
 	
 	function dropAnimation(endRow, column)
 	{
-		const distance = endRow;
-		//add it in the first row
-		$scope.grid[0][column] = $scope.currentColour;
-		if (endRow == 0) //if it is 0 then it will cause an infinite loop otherwise
-		{ $scope.inAnimation = false; dropAnimationCompletion(); return; }
+		let promise = new Promise((resolve, reject) => {
+			const distance = endRow;
+			//add it in the first row
+			$scope.grid[0][column] = $scope.currentColour;
+			if (endRow == 0) //if it is 0 then it will cause an infinite loop otherwise
+			{ $scope.inAnimation = false; dropAnimationCompletion(); return; }
 
-		var i = 0;
-		var repeat = setInterval(function() {
-			//now remove and add it in the column underneath until the loop breaks
-			$scope.grid[i][column] = "transparent"
-			$scope.grid[i + 1][column] = $scope.currentColour;
-			$scope.$applyAsync(); //for some reason you need this since it doesnt automatically update
+			var i = 0;
+			var repeat = setInterval(function() {
+				//now remove and add it in the column underneath until the loop breaks
+				$scope.grid[i][column] = "transparent"
+				$scope.grid[i + 1][column] = $scope.currentColour;
+				$scope.$applyAsync(); //for some reason you need this since it doesnt automatically update
 
-			i += 1;
-			if (i == distance)
-			{ $scope.inAnimation = false; clearInterval(repeat); dropAnimationCompletion(); }
+				i += 1;
+				if (i == distance)
+				{ $scope.inAnimation = false; clearInterval(repeat); resolve("Finished animation"); }
 		}, 50);
+		});
+		return promise
 	};
-
-	function dropAnimationCompletion() //.then isnt working so i need to chain functions
-	{
-		if ($scope.checkGrid($scope.currentColour) == true)  //only need to check the colour that has just moved, as only that colour could have been modified
-		{ $scope.gameOver = true; }
-		else
-		{ $scope.switchPlayer(); }
-	}
 
 	$scope.checkGrid = function(colour)
 	{
