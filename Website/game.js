@@ -23,6 +23,7 @@ app.controller("game", function($scope){
 		return promise
 	};
 
+	$scope.embed = true;
     $scope.players = [{name: "Embed1", id: null, rating: null, colour: "#ff0000"}, {name: "Embed2", id: null, rating: null, colour: "#0000ff"}]; //embed by default
 
 	$scope.currentColour = "";
@@ -41,6 +42,8 @@ app.controller("game", function($scope){
         let embed = url.searchParams.get("embed") === 'true'; //have to use this method since Boolean(string) is unreliable
         if (embed == null) { embed = false; }
         
+		$scope.embed = embed;
+
         //if game is in embed mode (it is being played from an external source e.g. my operatingSystem website) then just take the playerData from the URL.
         if (embed == true)  //when it is in embed mode, you don't need an id since there is no backend
         {
