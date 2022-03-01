@@ -12,7 +12,7 @@ There can be more than 2 people, for example you can have 4 people playing on a 
 
 ## Hosting
 Used to use firebase to host but it was buggy especially while using firebase authentication for some reason, so I switch to azure static websites
-OLD URL: https://connect4-863d1.web.app
+OLD URL: https://connect4-863d1.web.app \
 New URL: https://aryaaconnect4.z33.web.core.windows.net
 
 *The Old URL will still be available for a little bit until I migrate everything to the new URL*
