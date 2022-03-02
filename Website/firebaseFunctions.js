@@ -24,7 +24,7 @@ async function checkUser()
     return promise;
 };
 
-async function addData(key, data)
+async function setData(key, data)
 {
     let promise = new Promise(function(resolve, reject) {
         firebase.database().ref(key).set(data).then(function onSuccess(res) {

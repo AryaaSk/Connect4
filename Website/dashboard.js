@@ -79,10 +79,10 @@ app.controller("dashboard", function($scope)
 
             const uid = userCredential.user.uid;
             //when we sign up we need to add some data in firebase
-            addData("users/" + uid + "/name", displayName).then(() => {
-                addData("users/" + uid + "/rating", 0).then(() => {
-                    addData("users/" + uid + "/colour", "#ff0000").then(() => {
-                        addData("users/" + uid + "/currentGame", "Null").then(() => {
+            setData("users/" + uid + "/name", displayName).then(() => {
+                setData("users/" + uid + "/rating", 0).then(() => {
+                    setData("users/" + uid + "/colour", "#ff0000").then(() => {
+                        setData("users/" + uid + "/currentGame", "Null").then(() => {
                             // once you have signed in and added all the data we need to reload the screen
                             location.reload();
                         });
@@ -137,7 +137,7 @@ app.controller("dashboard", function($scope)
                 //if it is empty add yourself to the queue, then start listening for a change in your currentGame
                 queue.push(uid);
                 const queueReturnJSON = JSON.stringify(queue);
-                addData("queue", queueReturnJSON).then(() => {
+                setData("queue", queueReturnJSON).then(() => {
 
                     changed = 0;
                     const gameRef = firebase.database().ref("users/" + uid + "/currentGame");
@@ -161,18 +161,18 @@ app.controller("dashboard", function($scope)
                 const player1UID = uid;
                 const player2UID = queue[0];
 
-                const jsonData = JSON.stringify({ //just adding data underneath the game
+                const jsonData = { //just adding data underneath the game
                     currentMove: player1UID,
                     player1: player1UID,
                     player2: player2UID
-                });
+                };
 
                 //create new game
-                addData("games/" + gameID, jsonData).then(() => {
+                setData("games/" + gameID, jsonData).then(() => {
 
                     //set the currentGame of both users
-                    addData("users/" + player1UID + "/currentGame", gameID).then(() => {
-                        addData("users/" + player2UID + "/currentGame", gameID).then(() => {
+                    setData("users/" + player1UID + "/currentGame", gameID).then(() => {
+                        setData("users/" + player2UID + "/currentGame", gameID).then(() => {
                             //once you have added both we can delete the 2 players from the queue
                             const p1Index = queue.indexOf(player1UID);
                             queue.splice(p1Index, 1);
@@ -181,7 +181,7 @@ app.controller("dashboard", function($scope)
 
                             const queueReturnJSON = JSON.stringify(queue);
                             //upload the new queue back to firebase
-                            addData("queue", queueReturnJSON).then(() => {
+                            setData("queue", queueReturnJSON).then(() => {
                                 //then go to game.html (the gameID is stored in your user data in firebase)
                                 location.href = "game.html";
                             });

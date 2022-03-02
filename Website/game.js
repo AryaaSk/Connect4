@@ -31,11 +31,24 @@ app.controller("game", function($scope){
 	$scope.colour1 = "";
 	$scope.colour2 = "";
 
+	$scope.gameStarted = false;
+	$scope.waiting = false;
 	$scope.gameOver = false;
 	$scope.inAnimation = false;
 
+	$scope.uid = ""; //just need a global uid and p1p2 variable
+	$scope.me = ""; //because we don't know whether we are player 1 or player 2
+	$scope.otherPerson = "";
+	$scope.otherPersonUID = "";
+	$scope.myColour = "";
+	$scope.otherPersonColour = "";
+	$scope.gameID = "";
+
 	$scope.startGame = function() //also the restart game function
 	{
+		$scope.waiting = false;
+		$scope.gameStarted = false;
+
         //check if the game is in embed mode
         const urlString = window.location.href;
         const url = new URL(urlString);
@@ -44,19 +57,19 @@ app.controller("game", function($scope){
         
 		$scope.embed = embed;
 
+		//site might also pass in a scale value
+		let scale = Number(url.searchParams.get("scale"));
+		if (scale == null) { scale = 1; }
+		const scalePercentage = scale * 100;
+		document.getElementById("containerOuter").style.zoom = String(scalePercentage) + "%";
+
         //if game is in embed mode (it is being played from an external source e.g. my operatingSystem website) then just take the playerData from the URL.
         if (embed == true)  //when it is in embed mode, you don't need an id since there is no backend
-        {
-		//when embedded is true, we want the user to be able to select a colour, so we show the .selectColour screen
-		document.getElementById("selectColour").style.display = "grid";
+			{
+			//when embedded is true, we want the user to be able to select a colour, so we show the .selectColour screen
+			document.getElementById("selectColour").style.display = "grid";
 
-		//colour is set by the colour pickers set at the front            
-
-            //site might also pass in a scale value
-            let scale = Number(url.searchParams.get("scale"));
-            if (scale == null) { scale = 1; }
-            const scalePercentage = scale * 100;
-            document.getElementById("containerOuter").style.zoom = String(scalePercentage) + "%";
+			//colour is set by the colour pickers set at the front            
 
             //trying to make it as simple as possible when it is embeded:
             document.getElementById("container").style.width = "800px"; //only need 800px instead of 1300px as we don't have the side info any more
@@ -69,22 +82,29 @@ app.controller("game", function($scope){
             document.getElementById("containerInner").style.paddingTop = "0px"; //removing padding
             document.getElementById("containerOuter").style.overflow = "hidden"; //dont need overflow since screen params will be managed externally
 
+			$scope.gameStarted = true;
+
             //ABSOLUTE SMALLEST THE WINDOW CAN SUPPORT IS (740 X 1000)
         }
         else //get player objects from firebase (will do later)
         {
+			$scope.gameStarted = false;
+			$scope.waiting = true;
+
 			checkUser().then((uid) => {
+				$scope.uid = uid;
 				//now that we have this uid we can use it to access the data from the database
 				//first we have to get the gameID from the currentGame property in firebase
 				const gameIDRef = firebase.database().ref("users/" + uid + "/currentGame");
 
 				gameIDRef.once('value').then((gameIDSnapshot) => { 
 					const gameID = gameIDSnapshot.val();
+					$scope.gameID = gameID;
 					
 					//then use the gameID and get the game's data
 					const gameDataRef = firebase.database().ref("games/" + gameID);
 					gameDataRef.once('value').then((gameSnapshot) => { 
-						const gameData = JSON.parse(gameSnapshot.val());
+						const gameData = gameSnapshot.val();
 
 						const player1UID = gameData.player1;
 						const player2UID = gameData.player2;
@@ -97,6 +117,49 @@ app.controller("game", function($scope){
 
 								$scope.selectedColours(); //changing the colours
 								$scope.$applyAsync();
+
+								$scope.gameStarted = true;
+
+								//once we have setup all of that we can setup the realtime listener keep listening to the currentMove
+								const moveRef = firebase.database().ref("games/" + gameID + "/currentMove");
+								moveRef.on('value', (snapshot) => {
+									//when you recieve it check if it is your playerID, if not then it must be the other players so wait for the move
+									const playerID = snapshot.val();
+									
+									if (playerID == uid)
+									{
+										$scope.waiting = false; //set waiting to false since it is our turn to move and we also need to access the drop function for the previous move
+
+										//the other person has just moved so get their move from the database, check if you are player1 or player2
+										var p1p2 = "";
+										if (uid == player1UID) //you are player1 so you need to check in player2's database
+										{ p1p2 = "player2"; $scope.me = "player1"; $scope.otherPersonUID = player2UID; }
+										else
+										{ p1p2 = "player1"; $scope.me = "player2"; $scope.otherPersonUID = player1UID; }
+										$scope.otherPerson = p1p2;
+
+										//now set the colour's for each person
+										if ($scope.me == "player1")
+										{ $scope.myColour = $scope.players[0].colour; $scope.otherPersonColour = $scope.players[1].colour; }
+										else
+										{ $scope.myColour = $scope.players[1].colour; $scope.otherPersonColour = $scope.players[0].colour; }
+
+										const previousMoveRef = firebase.database().ref("games/" + gameID + "/" + $scope.otherPerson + "PreviousMove");
+										previousMoveRef.once('value').then((previousMoveSnapshot) => {
+											const previousMove = previousMoveSnapshot.val();
+											//it could be val meaning the other person hasn't had a move, in this case just ignore it
+											if (previousMove != null) //when it is not null we need to add that move into our own grid
+											{ 
+												//set colour
+												$scope.currentColour = $scope.otherPersonColour;
+												$scope.drop(previousMove, false).then(() => {
+													$scope.currentColour = $scope.myColour;
+												});
+											}
+										});
+									}
+
+								});
 							})
 						})
 
@@ -149,34 +212,68 @@ app.controller("game", function($scope){
 		{ $scope.currentColour = JSON.parse(JSON.stringify($scope.colour1)); } //default colour
 	};
 
-	$scope.drop = function(column)
+	$scope.drop = function(column, postAfter) //postAfter is whether to post it to firebase after you have finished or not
 	{
-		if ($scope.gameOver == true || $scope.inAnimation == true)
-		{ return; }
+		let promise = new Promise((resolve, reject) => {
+			if (postAfter == undefined)
+			{ postAfter = true; }
 
-		//keeping looping through rows at column to find where there is a space
-		var rowIndex = 0;
-		try
-		{ while ($scope.grid[rowIndex][column] == "transparent") {  rowIndex += 1; } }
-		catch
-		{}
-		rowIndex -= 1;
+			if ($scope.embed == false && $scope.waiting == true)
+			{ return }
 
-		if (rowIndex < 0) //the column is full
-		{
-			alert("This column is full");
-		}
-		else
-		{
-			//just insert at row index using the animation function
-			$scope.inAnimation = true;
-			dropAnimation(rowIndex, column).then(() => {
-				if ($scope.checkGrid($scope.currentColour) == true)  //only need to check the colour that has just moved, as only that colour could have been modified
-				{ $scope.gameOver = true; }
-				else
-				{ $scope.switchPlayer(); }
-			});
-		}
+			if ($scope.gameOver == true || $scope.inAnimation == true || $scope.gameStarted == false)
+			{ return; }
+
+			//keeping looping through rows at column to find where there is a space
+			var rowIndex = 0;
+			try
+			{ while ($scope.grid[rowIndex][column] == "transparent") {  rowIndex += 1; } }
+			catch
+			{}
+			rowIndex -= 1;
+
+			if (rowIndex < 0) //the column is full
+			{
+				alert("This column is full");
+			}
+			else
+			{
+				//just insert at row index using the animation function
+				$scope.inAnimation = true;
+				dropAnimation(rowIndex, column).then(() => {
+					resolve("Moved")
+
+					if (postAfter == true && $scope.embed == false)
+					{
+						setData("games/" + $scope.gameID + "/" + $scope.me + "PreviousMove", column).then(() => { //update your own previous move
+							//and finally need to update the currentMove so the other person gets notified
+							setData("games/" + $scope.gameID + "/currentMove", $scope.otherPersonUID).then(() => {
+								$scope.waiting = true;
+							})
+						})
+					}
+
+					const colourToCheck = JSON.parse(JSON.stringify($scope.currentColour)) //the currentColour will change while we are checking so we need a snapshot
+
+					if ($scope.checkGrid(colourToCheck) == true)  //only need to check the colour that has just moved, as only that colour could have been modified
+					{ 
+						$scope.gameOver = true;
+						console.log(`${colourToCheck} Wins`) //just have to display this instead of the currentColour, ill just do it with javascript:
+						document.getElementById("winText").innerText = `${colourToCheck} Wins`; //probably not the best idea, but it doesnt matter
+
+						//ill implement the game over sequence later
+					}
+					else
+					{
+						if ($scope.embed == true)
+						{
+							$scope.switchPlayer(); 
+						}
+					}
+				});
+			}
+		});
+		return promise
 	};
 	
 	function dropAnimation(endRow, column)
