@@ -23,7 +23,7 @@
             <div class="container" id="container">
                 <div class="containerInner" id="containerInner">
                     <h1>Connect4</h1>
-                    <h1 ng-hide="!gameOver" id="winText">{{capitalise(currentColour)}} Won !</h1> <!-- Need show player's name instead of colour, since I have allowed custom colours -->
+                    <h1 ng-hide="!gameOver" id="winText">{{whoWon}} Won !</h1> <!-- Need show player's name instead of colour, since I have allowed custom colours -->
 
                     <div class="connect4Row containerDiv" style="width: 700px; height: 100px; ;border-left: 1px solid var(--borderColourDrop); border-top: 1px solid var(--borderColourDrop);">
                         <div class="connect4ItemContainer drop" ng-click="drop(0)"><div class="counter drop" ng-style="{'background-color': currentColour }"></div></div>
@@ -48,10 +48,13 @@
 
                     <br>
                     <input ng-show="gameOver == true && embed == true" type="button" value="Restart Game" style="color: blue; cursor: pointer; border: none; background-color: transparent; font-size: 30px; text-decoration: underline;" ng-click="startGame()">
+                    <input ng-show="gameOver == true && embed == false" type="button" value="Back to Dashboard" style="color: blue; cursor: pointer; border: none; background-color: transparent; font-size: 30px; text-decoration: underline;" onclick="location.href = 'index.html';">
                 </div>
             
                 <div class="containerInner" id="playerInfo">
                     <h1>Players</h1>
+
+                    <h2 ng-hide="currentPlayer == '' || gameOver == true">Current Move: {{currentPlayer}}</h2>
                     <br>
                     <div class="playerBox containerDiv" ng-repeat="player in players track by $index">
                         <div>
@@ -59,7 +62,8 @@
                         </div>
                         <div>
                             Rating: {{player.rating}}<br>
-                            Colour: {{player.colour}}
+                            Colour: <br>
+                            <div class="infoCounter" style="margin: 0 auto; margin-top: 10px;" ng-style="{'background-color': player.colour }"></div>
                         </div>
                     </div>
                 </div>

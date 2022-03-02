@@ -3,6 +3,7 @@
 # Connect4 - STILL WORK IN PROGRESS
 
 ## I am writing this in AngularJS instead of Angular so I can have the ability to work on this at school, since terminal is blocked there.
+This is very poorly written since I prioritized time over quality and I probably won't come back to this in the near future.
 
 This is basically just a regular Connect4 game, where users can create profiles and keep a rating. There is also an embeded mode, so other people can just add this to their website for games and things.
 

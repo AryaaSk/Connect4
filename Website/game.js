@@ -31,11 +31,15 @@ app.controller("game", function($scope){
 	$scope.colour1 = "";
 	$scope.colour2 = "";
 
+	$scope.whoWon = "";
+	$scope.currentPlayer = "";
+
 	$scope.gameStarted = false;
 	$scope.waiting = false;
 	$scope.gameOver = false;
 	$scope.inAnimation = false;
 
+	//these variables are mostly because I can't access a lot of the data from the start game function inside the drop function, and I don't want to add a lot of parameters, just ignore them since it is just data from the startGame function
 	$scope.uid = ""; //just need a global uid and p1p2 variable
 	$scope.me = ""; //because we don't know whether we are player 1 or player 2
 	$scope.otherPerson = "";
@@ -129,7 +133,7 @@ app.controller("game", function($scope){
 									if (playerID == uid)
 									{
 										$scope.waiting = false; //set waiting to false since it is our turn to move and we also need to access the drop function for the previous move
-
+										
 										//the other person has just moved so get their move from the database, check if you are player1 or player2
 										var p1p2 = "";
 										if (uid == player1UID) //you are player1 so you need to check in player2's database
@@ -138,18 +142,21 @@ app.controller("game", function($scope){
 										{ p1p2 = "player1"; $scope.me = "player2"; $scope.otherPersonUID = player1UID; }
 										$scope.otherPerson = p1p2;
 
+										//we know it is our move, if $scope.me == "player1", then currentPlayer = $scope.players[0].name, otherwise it is $scope.players[1].name
 										//now set the colour's for each person
 										if ($scope.me == "player1")
-										{ $scope.myColour = $scope.players[0].colour; $scope.otherPersonColour = $scope.players[1].colour; }
+										{ $scope.myColour = $scope.players[0].colour; $scope.otherPersonColour = $scope.players[1].colour; $scope.currentPlayer = $scope.players[0].name; }
 										else
-										{ $scope.myColour = $scope.players[1].colour; $scope.otherPersonColour = $scope.players[0].colour; }
+										{ $scope.myColour = $scope.players[1].colour; $scope.otherPersonColour = $scope.players[0].colour; $scope.currentPlayer = $scope.players[1].name; }
+										$scope.$applyAsync();
+										
 
 										const previousMoveRef = firebase.database().ref("games/" + gameID + "/" + $scope.otherPerson + "PreviousMove");
 										previousMoveRef.once('value').then((previousMoveSnapshot) => {
 											const previousMove = previousMoveSnapshot.val();
 											//it could be val meaning the other person hasn't had a move, in this case just ignore it
 											if (previousMove != null) //when it is not null we need to add that move into our own grid
-											{ 
+											{
 												//set colour
 												$scope.currentColour = $scope.otherPersonColour;
 												$scope.drop(previousMove, false).then(() => {
@@ -249,6 +256,13 @@ app.controller("game", function($scope){
 							//and finally need to update the currentMove so the other person gets notified
 							setData("games/" + $scope.gameID + "/currentMove", $scope.otherPersonUID).then(() => {
 								$scope.waiting = true;
+
+								//since you have just moved set $scope.currentPlayer to the other player
+								if ($scope.me == "player1") //you are player1 so set the currentPlayer to the other person
+								{ $scope.currentPlayer = $scope.players[1].name; }
+								else
+								{ $scope.currentPlayer = $scope.players[0].name; }
+								$scope.$applyAsync();
 							})
 						})
 					}
@@ -259,9 +273,25 @@ app.controller("game", function($scope){
 					{ 
 						$scope.gameOver = true;
 						console.log(`${colourToCheck} Wins`) //just have to display this instead of the currentColour, ill just do it with javascript:
-						document.getElementById("winText").innerText = `${colourToCheck} Wins`; //probably not the best idea, but it doesnt matter
 
-						//ill implement the game over sequence later
+						//game over sequence: since we have the colour data of the person who won, we will use that to check who won, this will break if 2 players have the same colour so Ill need to stop people with the same colour getting into a game
+						var won = null;
+						var lost = null;
+						if ($scope.players[0].colour == colourToCheck)
+						{ won = $scope.players[0]; lost = $scope.players[1]; }
+						else
+						{ won = $scope.players[1]; lost = $scope.players[0]; }
+
+						$scope.whoWon = won.name;
+						console.log(won)
+
+						//now increase the rating by 25 when you win, and lose 25 when you loose (only if you are the host player)
+						if ($scope.me == "player1")
+						{
+							setData("users/" + won.id + "/rating", won.rating + 25).then(() => {
+								setData("users/" + lost.id + "/rating", lost.rating - 25).then(() => {});
+							});
+						}
 					}
 					else
 					{
@@ -283,7 +313,7 @@ app.controller("game", function($scope){
 			//add it in the first row
 			$scope.grid[0][column] = $scope.currentColour;
 			if (endRow == 0) //if it is 0 then it will cause an infinite loop otherwise
-			{ $scope.inAnimation = false; dropAnimationCompletion(); return; }
+			{ $scope.inAnimation = false; resolve("Finished animation"); return; }
 
 			var i = 0;
 			var repeat = setInterval(function() {

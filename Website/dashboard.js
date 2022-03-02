@@ -43,6 +43,12 @@ app.controller("dashboard", function($scope)
                 colourRef.once('value').then((colour) => { 
                     $scope.player.colour = colour.val();
                     $scope.$applyAsync();
+
+                    //we also have to set the player's currentGame to "Null", and remove any games which the player hosted
+                    setData("users/" + uid + "/currentGame", "Null").then(() => {
+                        const gameRef = firebase.database().ref("games/" + uid);
+                        gameRef.remove().then(() => {})
+                    }) 
                 });  
             });  
         });
@@ -118,79 +124,82 @@ app.controller("dashboard", function($scope)
 
     $scope.findGame = function()
     {
-        //make a queue system in firebase
+        //the first thing to do is update the colour
+        setData("users/" + $scope.player.id + "/colour", $scope.player.colour).then(() => {
+            //make a queue system in firebase
 
-        //when the user clicks find match, the game checks if there is anyone in the queue, if there is then just create a new game, with gameID of your uid, then set that person's currentGame to the gameID, and your own gameID to your uid
+            //when the user clicks find match, the game checks if there is anyone in the queue, if there is then just create a new game, with gameID of your uid, then set that person's currentGame to the gameID, and your own gameID to your uid
 
-        document.getElementById("findMatchButton").disabled = true;
+            document.getElementById("findMatchButton").disabled = true;
 
-        const queueRef = firebase.database().ref("queue");
-        queueRef.once('value').then((queueJSON) => {
-            const uid = $scope.player.id;
+            const queueRef = firebase.database().ref("queue");
+            queueRef.once('value').then((queueJSON) => {
+                const uid = $scope.player.id;
 
-            //parse the JSON
-            var queue = JSON.parse(queueJSON.val());
+                //parse the JSON
+                var queue = JSON.parse(queueJSON.val());
 
-            //check if the queue is empty
-            if (queue.length == 0)
-            {
-                //if it is empty add yourself to the queue, then start listening for a change in your currentGame
-                queue.push(uid);
-                const queueReturnJSON = JSON.stringify(queue);
-                setData("queue", queueReturnJSON).then(() => {
+                //check if the queue is empty
+                if (queue.length == 0)
+                {
+                    //if it is empty add yourself to the queue, then start listening for a change in your currentGame
+                    queue.push(uid);
+                    const queueReturnJSON = JSON.stringify(queue);
+                    setData("queue", queueReturnJSON).then(() => {
 
-                    changed = 0;
-                    const gameRef = firebase.database().ref("users/" + uid + "/currentGame");
-                    gameRef.on('value', (snapshot) => {
-                        console.log("Waiting in queue");
-                        changed += 1; //the first time it is just getting the data, the second time is when it actually changes
+                        changed = 0;
+                        const gameRef = firebase.database().ref("users/" + uid + "/currentGame");
+                        gameRef.on('value', (snapshot) => {
+                            console.log("Waiting in queue");
+                            changed += 1; //the first time it is just getting the data, the second time is when it actually changes
 
-                        if (changed == 2)
-                        {
-                            //when there is a change, go to the game.html, and you will can read the currentGam from there
-                            location.href = "game.html";
-                            console.log("changed")
-                        }
-                    });
-                });
-            }
-            else
-            {
-                //if there is someone else in the queue, then create a new game, and set both of your currentGames to the gameID (which is your uid)
-                const gameID = uid;
-                const player1UID = uid;
-                const player2UID = queue[0];
-
-                const jsonData = { //just adding data underneath the game
-                    currentMove: player1UID,
-                    player1: player1UID,
-                    player2: player2UID
-                };
-
-                //create new game
-                setData("games/" + gameID, jsonData).then(() => {
-
-                    //set the currentGame of both users
-                    setData("users/" + player1UID + "/currentGame", gameID).then(() => {
-                        setData("users/" + player2UID + "/currentGame", gameID).then(() => {
-                            //once you have added both we can delete the 2 players from the queue
-                            const p1Index = queue.indexOf(player1UID);
-                            queue.splice(p1Index, 1);
-                            const p2Index = queue.indexOf(player2UID);
-                            queue.splice(p2Index, 1);
-
-                            const queueReturnJSON = JSON.stringify(queue);
-                            //upload the new queue back to firebase
-                            setData("queue", queueReturnJSON).then(() => {
-                                //then go to game.html (the gameID is stored in your user data in firebase)
+                            if (changed == 2)
+                            {
+                                //when there is a change, go to the game.html, and you will can read the currentGam from there
                                 location.href = "game.html";
-                            });
+                                console.log("changed")
+                            }
+                        });
+                    });
+                }
+                else
+                {
+                    //if there is someone else in the queue, then create a new game, and set both of your currentGames to the gameID (which is your uid)
+                    const gameID = uid;
+                    const player1UID = uid;
+                    const player2UID = queue[0];
+
+                    const jsonData = { //just adding data underneath the game
+                        currentMove: player1UID,
+                        player1: player1UID,
+                        player2: player2UID
+                    };
+
+                    //create new game
+                    setData("games/" + gameID, jsonData).then(() => {
+
+                        //set the currentGame of both users
+                        setData("users/" + player1UID + "/currentGame", gameID).then(() => {
+                            setData("users/" + player2UID + "/currentGame", gameID).then(() => {
+                                //once you have added both we can delete the 2 players from the queue
+                                const p1Index = queue.indexOf(player1UID);
+                                queue.splice(p1Index, 1);
+                                const p2Index = queue.indexOf(player2UID);
+                                queue.splice(p2Index, 1);
+
+                                const queueReturnJSON = JSON.stringify(queue);
+                                //upload the new queue back to firebase
+                                setData("queue", queueReturnJSON).then(() => {
+                                    //then go to game.html (the gameID is stored in your user data in firebase)
+                                    location.href = "game.html";
+                                });
+                            })
                         })
+
                     })
+                }
 
-                })
-            }
-
+            });
         });
     }
 });
