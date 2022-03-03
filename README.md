@@ -19,7 +19,8 @@ New URL: https://aryaaconnect4.z33.web.core.windows.net
 *The Old URL will still be available for a little bit until I migrate everything to the new URL*
 
 ## Embeded:
-*Need to change in the future to the new url*\
+*Not able to change to new URL, as I made it mobile friendly but in the process also broke the embedded view, if you want the version which works just go back in history and find the version on March 2nd 2022 (I haven't checked but this is the version before I make it responsive so it should work)*
+
 Use this URL to access the embed mode: https://connect4-863d1.web.app/game.html?embed=true
 
 The minimum width and height is: 740px X 1000px\
