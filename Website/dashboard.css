@@ -10,7 +10,7 @@ body
 .containerInner
 {
     height: 100%;
-    width: 1200px;
+    width: 100%;
 
     margin: 0 auto;
 
@@ -33,23 +33,6 @@ body
     border-radius: 20px;
     font-size: 40px;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #loginSignupWrapper
@@ -77,8 +60,8 @@ body
 
     z-index: 1;
 
-    height: 800px;
-    width: 1000px;
+    height: 80vh;
+    width: 80vw;
 
     background-color: white;
     border-radius: 10px;

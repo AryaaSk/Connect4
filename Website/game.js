@@ -61,11 +61,29 @@ app.controller("game", function($scope){
         
 		$scope.embed = embed;
 
-		//site might also pass in a scale value
+		//try and scale it correctly (based on width)
+		const width = window.innerWidth;
+		let scaleRatio = 0;
+		if (window.matchMedia("(orientation: portrait)").matches) {
+			//portrait mode, so the width is 800px
+			scaleRatio = width / 800;
+		}
+		else
+		{
+			//landscape mode, so the width is 1300px
+			scaleRatio = width / 1300;
+		}
+		let estimatedScale = scaleRatio * 100 - 10;
+		if (estimatedScale < 45)
+		{ estimatedScale = 45; }
+
+		//site might also pass in a scale value, if not then use the estimated scale
 		let scale = Number(url.searchParams.get("scale"));
-		if (scale == null) { scale = 1; }
-		const scalePercentage = scale * 100;
-		document.getElementById("containerOuter").style.zoom = String(scalePercentage) + "%";
+		if (scale != 0) //only override if the user actually passes in a value
+		{ const scalePercentage = scale * 100; document.getElementById("containerOuter").style.zoom = String(scalePercentage) + "%"; }
+		else
+		{ document.getElementById("containerOuter").style.zoom = String(estimatedScale) + "%"; }
+
 
         //if game is in embed mode (it is being played from an external source e.g. my operatingSystem website) then just take the playerData from the URL.
         if (embed == true)  //when it is in embed mode, you don't need an id since there is no backend

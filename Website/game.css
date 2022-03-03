@@ -8,7 +8,7 @@
     height: 100%; /*embed mode doesnt work on chrome when using 100vh/100vw, so i used 100% which should do the same thing in theory*/
     width: 100%;
 
-    overflow-y: hidden;
+    /*overflow-y: hidden;*/
 }
 .container
 {
@@ -20,6 +20,19 @@
 	grid-template-columns: 70% 30%;
 	grid-template-rows: 100%;   
 }
+@media only screen and (orientation: portrait) {
+    .container
+    {
+        height: 100%;
+        width: 800px;
+        margin: 0 auto;
+    
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: max-content auto;   
+    }
+}
+
 .containerInner
 {	
     height: calc(100% - 50px); /*to account for the padding*/

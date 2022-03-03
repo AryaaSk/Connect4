@@ -8,6 +8,7 @@ app.controller("dashboard", function($scope)
 
     $scope.authenticate = async function()
     {
+        $scope.setupDashboard();
         checkUser().then((uid) => {
             //now that we have this uid we can use it to access the data from the database
             $scope.getPlayer(uid);
@@ -16,6 +17,29 @@ app.controller("dashboard", function($scope)
             $scope.getPlayer(rejected);
         })
     }
+    $scope.setupDashboard = function()
+    {
+        //try and scale it correctly (based on width)
+		const width = window.innerWidth;
+		let scaleRatio = 0;
+		if (window.matchMedia("(orientation: portrait)").matches) {
+			//portrait mode, so the width is 800px
+			scaleRatio = width / 800;
+		}
+		else
+		{
+			//landscape mode, so the width is 1300px
+			scaleRatio = width / 1300;
+		}
+		let estimatedScale = scaleRatio * 100 + 5;
+		if (estimatedScale < 50)
+		{ estimatedScale = 50; }
+        if (estimatedScale > 115)
+        { estimatedScale = 115; }
+        
+        document.getElementById("container").style.zoom = String(estimatedScale) + "%";
+    }
+
 
     $scope.player = {name: "", id: "", rating: 0, colour: "#000000"};
     $scope.getPlayer = function(uid)
