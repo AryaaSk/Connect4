@@ -7,6 +7,11 @@ This is very poorly written since I prioritized time over quality and I probably
 
 This is basically just a regular Connect4 game, where users can create profiles and keep a rating. There is also an embeded mode, so other people can just add this to their website for games and things.
 
+Here are some previews:
+![Preview1](https://github.com/AryaaSk/Other-Projects/blob/main/Previews/connect41.png?raw=true)
+
+![Preview2](https://github.com/AryaaSk/Other-Projects/blob/main/Previews/connect43.png?raw=true)
+
 ## Game Ideas:
 Users can have a specific colour counter when they join, and they can change it (maybe every week or something).
 There can be more than 2 people, for example you can have 4 people playing on a bigger board.
@@ -31,3 +36,7 @@ Here is an example to just add to your HTML:
 ```
 <iframe  style="height: 1000px; width: 740px" src="https://connect4-863d1.web.app/game.html?embed=true&&scale=1"></iframe>
 ```
+
+Here is a preview of the embedded version:
+
+![Preview1](https://github.com/AryaaSk/Other-Projects/blob/main/Previews/conenct4.png?raw=true)
